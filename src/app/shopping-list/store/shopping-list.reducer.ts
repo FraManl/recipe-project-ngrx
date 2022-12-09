@@ -60,25 +60,41 @@ export function shoppingListReducer(
     case ShoppingListActions.UPDATE_INGREDIENT:
       // enforce immutable logic... prevent from editing old state*
       // always edit immutably, copy first, then edit
-      const ingredient = state.ingredients[action.payload.index];
+      const ingredient = state.ingredients[state.editedIngredientIndex];
       const updatedIngredient = {
         ...ingredient,
-        ...action.payload.ingredient,
+        ...action.payload,
       };
       const updatedIngredients = [...state.ingredients];
       // Array of ingredients where we overwrote 1 ingredient
-      updatedIngredients[action.payload.index] = updatedIngredient;
+      updatedIngredients[state.editedIngredientIndex] = updatedIngredient;
       return {
         ...state,
-        ingredients: updatedIngredients,
+        ingredints: updatedIngredients,
+        editIngredient: null,
+        editIngredientIndex: -1,
       };
 
     case ShoppingListActions.DELETE_INGREDIENT:
       return {
         ...state,
         ingredients: state.ingredients.filter((ig, igIndex) => {
-          return igIndex !== action.payload;
+          return igIndex !== state.editedIngredientIndex;
         }),
+      };
+
+    case ShoppingListActions.START_EDIT:
+      return {
+        ...state,
+        editedIngredientIndex: action.payload,
+        editedIngredient: { ...state.ingredients[action.payload] },
+      };
+
+    case ShoppingListActions.STOP_EDIT:
+      return {
+        ...state,
+        editedIngredient: null,
+        editedIngredientIndex: -1,
       };
 
     // return any case we're not explicitely handling
