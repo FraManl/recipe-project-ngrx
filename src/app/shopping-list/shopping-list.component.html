@@ -1,12 +1,16 @@
 <div class="row">
   <div class="col-xs-10">
     <app-shopping-edit></app-shopping-edit>
-    <hr>
+    <hr />
     <ul class="list-group">
+      <!-- Using pipe to subscribe (to the observable using async) and resolve the value (the array) -->
       <a
         class="list-group-item"
         style="cursor: pointer"
-        *ngFor="let ingredient of (ingredients | async).ingredients; let i = index"
+        *ngFor="
+          let ingredient of (ingredients | async).ingredients;
+          let i = index
+        "
         (click)="onEditItem(i)"
       >
         {{ ingredient.name }} ({{ ingredient.amount }})

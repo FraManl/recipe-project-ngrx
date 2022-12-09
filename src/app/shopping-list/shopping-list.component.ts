@@ -6,6 +6,8 @@ import { Ingredient } from "../shared/ingredient.model";
 import { ShoppingListService } from "./shopping-list.service";
 import { LoggingService } from "../logging.service";
 
+import * as fromShoppingList from "./store/shopping-list.reducer";
+
 @Component({
   selector: "app-shopping-list",
   templateUrl: "./shopping-list.component.html",
@@ -22,7 +24,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     private loggingService: LoggingService,
     // Selecting the state coming from the store
     // Expected structure is coming from app.module reducer map {shoppingList: ShoppingListReducer} and from shopping list reducer
-    private store: Store<{ shoppingList: { ingredients: Ingredient[] } }>
+    private store: Store<fromShoppingList.AppState>
   ) {}
 
   ngOnInit() {
@@ -37,9 +39,12 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     // Now with reducer (state management); it will also fulfill what getIngredients() does on load...
     // Select a slice of the state, in case the store contains multiple state objects
     // Tell angular which part of the store i'm intrerested in
-    this.store.select("shoppingList"); // this returns an obsercable
+    this.ingredients = this.store.select("shoppingList"); // this returns an observable
 
-    this.loggingService.printLog("Hello from ShoppingListComponent ngOnInit!");
+    // note that the pipe in templater is optional, can subscribe from here (don't forget to destroy)
+    // this.ingredients = this.store.select("shoppingList").subscribe();
+
+    // this.loggingService.printLog("Hello from ShoppingListComponent ngOnInit!");
   }
 
   onEditItem(index: number) {
