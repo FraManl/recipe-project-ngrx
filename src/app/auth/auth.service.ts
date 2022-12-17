@@ -4,8 +4,12 @@ import { Router } from "@angular/router";
 import { catchError, tap } from "rxjs/operators";
 import { throwError, BehaviorSubject } from "rxjs";
 import { environment } from "../../environments/environment";
+import * as fromApp from "../store/app.reducer";
+import * as AuthActions from "./store/auth.action";
 
 import { User } from "./user.model";
+import { Store } from "@ngrx/store";
+// import { FormatInputPathObject } from "path";
 
 export interface AuthResponseData {
   kind: string;
@@ -19,10 +23,17 @@ export interface AuthResponseData {
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
-  user = new BehaviorSubject<User>(null);
+  // this user subject is the center piece of this service
+  // this.user.next() is where we emit a new state user... a change
+  // user = new BehaviorSubject<User>(null);
+
   private tokenExpirationTimer: any;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private store: Store<fromApp.AppState> // inject store
+  ) {}
 
   signup(email: string, password: string) {
     return this.http
@@ -89,7 +100,18 @@ export class AuthService {
     );
 
     if (loadedUser.token) {
-      this.user.next(loadedUser);
+      // replace this.user.next() by the store globally managed service
+      // this.user.next(loadedUser);
+      // remember need to create new object
+      this.store.dispatch(
+        new AuthActions.Login({
+          email: loadedUser.email,
+          userId: loadedUser.id,
+          token: loadedUser.token,
+          expirationDate: new Date(userData._tokenExpirationDate),
+        })
+      );
+
       const expirationDuration =
         new Date(userData._tokenExpirationDate).getTime() -
         new Date().getTime();
@@ -98,7 +120,8 @@ export class AuthService {
   }
 
   logout() {
-    this.user.next(null);
+    // this.user.next(null);
+    this.store.dispatch(new AuthActions.Logout());
     this.router.navigate(["/auth"]);
     localStorage.removeItem("userData");
     if (this.tokenExpirationTimer) {
@@ -120,8 +143,21 @@ export class AuthService {
     expiresIn: number
   ) {
     const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
+    // user is already created... so no need
+    // const user = new User(email, userId, token, expirationDate);
+    // this.user.next(user);
+
+    // we will remove this later, there is a better way, but need this below for localStorage
     const user = new User(email, userId, token, expirationDate);
-    this.user.next(user);
+    this.store.dispatch(
+      new AuthActions.Login({
+        email: email,
+        userId: userId,
+        token: token,
+        expirationDate: expirationDate,
+      })
+    );
+
     this.autoLogout(expiresIn * 1000);
     localStorage.setItem("userData", JSON.stringify(user));
   }

@@ -9,11 +9,10 @@ export class Login implements Action {
   // this is one way of doing it... only the only way, can also create the user before dispatching inside the action; here we make the reducer work more
   constructor(
     public payload: {
-      mail: string;
-      userId;
-      string;
+      email: string;
+      userId: string;
       token: string;
-      expirationDate: string;
+      expirationDate: Date;
     }
   ) {}
 }

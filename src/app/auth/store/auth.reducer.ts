@@ -18,7 +18,20 @@ export function authReducer(
 ) {
   switch (action.type) {
     case AuthActions.LOGIN:
+      // build the user object, the payload comes from the action
+      const user = new User(
+        action.payload.email,
+        action.payload.userId,
+        action.payload.token,
+        action.payload.expirationDate
+      );
+      // remember, don't have to emit anymore, just need to return this inside the state
+      // copy old state,then overwrite everything we need to overwrite
+      return { ...state, user: user };
+
+      return;
     case AuthActions.LOGOUT:
+      return { ...state, user: null };
 
     // very important
     default:
