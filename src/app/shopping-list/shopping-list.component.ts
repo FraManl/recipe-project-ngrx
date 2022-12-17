@@ -3,7 +3,7 @@ import { Subscription, Observable } from "rxjs";
 import { Store } from "@ngrx/store";
 
 import { Ingredient } from "../shared/ingredient.model";
-import { ShoppingListService } from "./shopping-list.service";
+// import { ShoppingListService } from "./shopping-list.service";
 import { LoggingService } from "../logging.service";
 
 import * as fromShoppingList from "./store/shopping-list.reducer";
@@ -21,7 +21,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
 
   constructor(
-    private slService: ShoppingListService,
+    // private slService: ShoppingListService,
     private loggingService: LoggingService,
     // Selecting the state coming from the store
     // Expected structure is coming from app.module reducer map {shoppingList: ShoppingListReducer} and from shopping list reducer

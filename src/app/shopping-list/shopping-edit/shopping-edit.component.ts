@@ -4,7 +4,7 @@ import { Store } from "@ngrx/store";
 import { Subscription } from "rxjs";
 
 import { Ingredient } from "../../shared/ingredient.model";
-import { ShoppingListService } from "../shopping-list.service";
+// import { ShoppingListService } from "../shopping-list.service";
 import * as ShoppingListActions from "../store/shopping-list.actions";
 import * as fromShoppingList from "../store/shopping-list.reducer";
 
@@ -21,7 +21,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   editedItem: Ingredient;
 
   constructor(
-    private slService: ShoppingListService,
+    // private slService: ShoppingListService,
     private store: Store<fromShoppingList.AppState>
   ) {}
 
@@ -32,6 +32,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
         if (stateData.editedIngredientIndex > -1) {
           this.editMode = true;
           this.editedItem = stateData.editedIngredient;
+          // this.editedItemIndex = stateData.editedIngredientIndex;
           this.slForm.setValue({
             name: this.editedItem.name,
             amount: this.editedItem.amount,
