@@ -1,19 +1,25 @@
 import { StaticReflector } from "@angular/compiler";
 import { Action } from "@ngrx/store";
+import { appendFile } from "fs";
 import { Ingredient } from "../../shared/ingredient.model";
 import * as ShoppingListActions from "./shopping-list.actions";
 
-// pattern to manage multiple state formats a distributions
-// describing all appplication state
-export interface AppState {
-  shoppingList: State;
-}
+// pattern to manage multiple state formats
 
+// describing application state for shopping list
+// define how the state should look like for the shopping list
+// For this part of the app, only this state should be defined here
 export interface State {
   ingredients: Ingredient[];
   editedIngredient: Ingredient;
   editedIngredientIndex: number;
 }
+
+// this does not really belong here now that we have multiple reducers (shopping list & auth)
+// See global store instead
+// export interface AppState {
+//   shoppingList: State;
+// }
 
 // Set initial state
 const initialState = {
