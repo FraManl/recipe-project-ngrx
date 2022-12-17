@@ -1,7 +1,9 @@
 import { Action } from "@ngrx/store";
 
-export const LOGIN = "LOGIN";
-export const LOGOUT = "LOGOUT";
+// be careful as those identifiers are reachable by all reducers in the entire app...
+// have to be unique
+export const LOGIN = "[Auth] Login";
+export const LOGOUT = "[Auth] Logout";
 
 export class Login implements Action {
   readonly type = LOGIN;
