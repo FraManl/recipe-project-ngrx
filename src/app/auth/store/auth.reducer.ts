@@ -6,10 +6,16 @@ import * as AuthActions from "./auth.action";
 // define how the state should look like for auth
 export interface State {
   user: User;
+  authError: string;
+  // loading managed in the NGRX state, ngrx very useful to manage stuffs such as loading states aswell...
+  // prevent from doing a lot of error .. in the configuration of the UI
+  loading: boolean;
 }
 
 const initialState: State = {
   user: null,
+  authError: null,
+  loading: false,
 };
 
 export function authReducer(
@@ -27,11 +33,21 @@ export function authReducer(
       );
       // remember, don't have to emit anymore, just need to return this inside the state
       // copy old state,then overwrite everything we need to overwrite
-      return { ...state, user: user };
+      return { ...state, authError: null, user: user, loading: false };
 
-      return;
     case AuthActions.LOGOUT:
       return { ...state, user: null };
+
+    case AuthActions.LOGIN_START:
+      return { ...state, authError: null, loading: true };
+
+    case AuthActions.LOGIN_FAIL:
+      return {
+        ...state,
+        user: null,
+        authError: action.payload,
+        loading: false,
+      };
 
     // very important
     default:
