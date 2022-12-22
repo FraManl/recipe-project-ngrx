@@ -3,8 +3,10 @@ import { Actions, Effect, ofType } from "@ngrx/effects";
 import { catchError, map } from "rxjs/operators";
 import { switchMap } from "rxjs/operators";
 import * as AuthActions from "./auth.action";
-import { environment } from "../../../environments";
+import { environment } from "../../../environments/environment";
+
 import { of } from "rxjs";
+import { Injectable } from "@angular/core";
 
 export interface AuthResponseData {
   kind: string;
@@ -16,6 +18,8 @@ export interface AuthResponseData {
   registered?: boolean;
 }
 
+// just make it injectable for inner modules
+@Injectable()
 export class AuthEffects {
   // Effects are actions themselves, observables, and they return actions, it just executes some code
   // the idea here is to execute code when actions are dispatched, like an interceptor, but the idea is not to change the state; it is to build effects aside of actions, using a stream
