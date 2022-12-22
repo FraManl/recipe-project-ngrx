@@ -43,6 +43,9 @@ export function authReducer(
     case AuthActions.SIGNUP_START:
       return { ...state, authError: null, loading: true };
 
+    case AuthActions.AUTO_LOGIN:
+      return {};
+
     case AuthActions.AUTHENTICATE_FAIL:
       return {
         ...state,

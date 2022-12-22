@@ -8,6 +8,7 @@ import { environment } from "../../../environments/environment";
 import { of } from "rxjs";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
+import { User } from "../user.model";
 
 export interface AuthResponseData {
   kind: string;
@@ -26,6 +27,8 @@ const handleAuthentication = (
   token: string
 ) => {
   const expirationDate = new Date(new Date().getTime() + +expiresIn * 1000);
+  const user = new User(email, userId, token, expirationDate);
+  localStorage.setItem("userData", JSON.stringify(user));
   return new AuthActions.AuthenticateSuccess({
     email: email,
     userId: userId,
@@ -125,11 +128,66 @@ export class AuthEffects {
 
   // make NGRX know that this effect will not dispatch any action in the end
   @Effect({ dispatch: false })
-  authSuccess = this.actions$.pipe(
+  authRedirect = this.actions$.pipe(
     // only fires when login is successful
-    ofType(AuthActions.AUTHENTICATE_SUCCESS),
+    ofType(AuthActions.AUTHENTICATE_SUCCESS, AuthActions.LOGOUT),
     tap(() => {
       this.router.navigate(["/"]);
+    })
+  );
+
+  @Effect({ dispatch: false })
+  authLogout = this.actions$.pipe(
+    ofType(AuthActions.LOGOUT),
+    tap(() => {
+      localStorage.removeItem("userData");
+    })
+  );
+
+  @Effect()
+  autoLogin = this.actions$.pipe(
+    ofType(AuthActions.AUTO_LOGIN),
+    map(() => {
+      // retrieve the user from local storage
+      const userData: {
+        email: string;
+        id: string;
+        _token: string;
+        _tokenExpirationDate: string;
+      } = JSON.parse(localStorage.getItem("userData"));
+      if (!userData) {
+        // we do this because we need to return an action in the end, otherwise error
+        return { type: "DUMMY" };
+      }
+
+      // create a user
+      const loadedUser = new User(
+        userData.email,
+        userData.id,
+        userData._token,
+        new Date(userData._tokenExpirationDate)
+      );
+
+      // check validity of token
+      if (loadedUser.token) {
+        // replace this.user.next() by the store globally managed service
+        // this.user.next(loadedUser);
+        // remember need to create new object
+        return new AuthActions.AuthenticateSuccess({
+          email: loadedUser.email,
+          userId: loadedUser.id,
+          token: loadedUser.token,
+          expirationDate: new Date(userData._tokenExpirationDate),
+        });
+
+        // autologout logic
+        // const expirationDuration =
+        //   new Date(userData._tokenExpirationDate).getTime() -
+        //   new Date().getTime();
+        // this.autoLogout(expirationDuration);
+      }
+      // we do this because we need to return an action in the end, otherwise error
+      return { type: "DUMMY" };
     })
   );
 
