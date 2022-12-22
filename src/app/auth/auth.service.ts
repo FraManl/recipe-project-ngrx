@@ -104,7 +104,7 @@ export class AuthService {
       // this.user.next(loadedUser);
       // remember need to create new object
       this.store.dispatch(
-        new AuthActions.Login({
+        new AuthActions.AuthenticateSuccess({
           email: loadedUser.email,
           userId: loadedUser.id,
           token: loadedUser.token,
@@ -150,7 +150,7 @@ export class AuthService {
     // we will remove this later, there is a better way, but need this below for localStorage
     const user = new User(email, userId, token, expirationDate);
     this.store.dispatch(
-      new AuthActions.Login({
+      new AuthActions.AuthenticateSuccess({
         email: email,
         userId: userId,
         token: token,

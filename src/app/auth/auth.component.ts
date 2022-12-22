@@ -31,6 +31,7 @@ export class AuthComponent implements OnDestroy, OnInit {
   alertHost: PlaceholderDirective;
 
   private closeSub: Subscription;
+  private storeSub: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -42,7 +43,7 @@ export class AuthComponent implements OnDestroy, OnInit {
   ngOnInit(): void {
     // instead of managing with observable, we will initialize the component with a ngrx state managerand handle actions with the reducer; side effects will be handled by effects actions
     // States elements that impact a lots of parts of the application : good to use ngrx... you gain a lot, but what does not impact app a lot in the scope of state, can be managed with observables...
-    this.store.select("auth").subscribe((authState) => {
+    this.storeSub = this.store.select("auth").subscribe((authState) => {
       this.isLoading = authState.loading;
       this.error = authState.authError;
       if (this.error) {
@@ -62,8 +63,9 @@ export class AuthComponent implements OnDestroy, OnInit {
     const email = form.value.email;
     const password = form.value.password;
 
-    let authObs: Observable<AuthResponseData>;
-    this.isLoading = true;
+    // no more with ngrx
+    // let authObs: Observable<AuthResponseData>;
+    // this.isLoading = true;
 
     if (this.isLoginMode) {
       // without effect
@@ -73,7 +75,10 @@ export class AuthComponent implements OnDestroy, OnInit {
         new AuthActions.LoginStart({ email: email, password: password })
       );
     } else {
-      authObs = this.authService.signup(email, password);
+      // authObs = this.authService.signup(email, password);
+      this.store.dispatch(
+        new AuthActions.SignupStart({ email: email, password: password })
+      );
     }
 
     // useless with NGRX now, need to have another way of subscribing to this observable
@@ -95,12 +100,15 @@ export class AuthComponent implements OnDestroy, OnInit {
   }
 
   onHandleError() {
-    this.error = null;
+    this.store.dispatch(new AuthActions.ClearError());
   }
 
   ngOnDestroy() {
     if (this.closeSub) {
       this.closeSub.unsubscribe();
+    }
+    if (this.storeSub) {
+      this.storeSub.unsubscribe();
     }
   }
 
